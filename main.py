@@ -55,22 +55,6 @@ def get_conversation(uid1, uid2):
         return "No se han encontrado mensajes entre estos usuarios."
     return json.jsonify(resultados1 + resultados2)
 
-@app.route("/api/v1/message/<int:uid1>/<int:uid2>", methods=['POST'])
-def create_message(uid1, uid2):
-    data = {key: request.json[key] for key in message_keys}
-    data["sender"] = uid1
-    data["receptant"] = uid2
-    result = mensajes.insert_one(data)
-    if (result):
-        message = 'Se ha creado un mensaje exitosamente.'
-        success = True
-    else:
-        message = 'No se ha podido crear el mensaje.'
-        success = False
-
-    return json.jsonify([{'success': success, 'message': message}])
-
-
 @app.route("/api/v1/busqueda/<texto>")
 def search_message(texto):
     texto = texto.split(",")
@@ -139,8 +123,8 @@ def search_message3(texto):
     if len(lista) == 0:
         return 'No hay resultados para esa búsqueda'
     return json.jsonify(lista)
-        
-                 
+
+
 @app.route("/api/v1/busqueda3/<texto>/<int:uid>")
 def search_message_user3(texto,uid):
     texto = texto.split(",")
@@ -159,6 +143,21 @@ def search_message_user3(texto,uid):
     if len(lista) == 0:
         return 'No hay resultados para esa búsqueda'
     return json.jsonify(lista)
+
+@app.route("/api/v1/message/<int:uid1>/<int:uid2>", methods=['POST'])
+def create_message(uid1, uid2):
+    data = request.get_json(force=True)
+    data["sender"] = uid1
+    data["receptant"] = uid2
+    result = mensajes.insert_one(data)
+    if (result):
+        message = 'Se ha creado un mensaje exitosamente.'
+        success = True
+    else:
+        message = 'No se ha podido crear el mensaje.'
+        success = False
+
+    return json.jsonify([{'success': success, 'message': message}])
 
 @app.route('/api/v1/message/<mid>', methods=['DELETE'])
 def delete_message(mid):
